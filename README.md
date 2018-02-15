@@ -24,7 +24,7 @@ Responses are parsed and their amount fields are returned in cents like the requ
 ## Response Objects
 Responses are returned as objects and can be accessed as arrays.
 ```php
-$response = $this->client->inquire($retref);
+$response = $client->inquire($retref);
 $response->amount; // returns int
 $response->toJSON(); // Returns JSON encoded string
 $response->toArray(); // Returns array of attributes
@@ -32,7 +32,7 @@ $response->toArray(); // Returns array of attributes
 
 ## Authorizing Transactions
 ```php
-$authorization_response = $this->client->authorize([
+$authorization_response = $client->authorize([
     'account' => '4242424242424242',
     'amount'  => '100',
     'expiry'  => '0120',
@@ -41,7 +41,7 @@ $authorization_response = $this->client->authorize([
 
 **You can also authorize and capture in the same request like so**
 ```php
-$capture_response = $this->client->authorize([
+$capture_response = $client->authorize([
     'account' => '4242424242424242',
     'amount'  => '100',
     'expiry'  => '0120',
@@ -58,7 +58,7 @@ All returned fields [Authorization Response](https://developer.cardconnect.com/c
 ```php
 $auth_retref = '123456654321';
 $params = []; // optional
-$capture_response = $this->client->capture($auth_retref, $params);
+$capture_response = $client->capture($auth_retref, $params);
 ```
 To view all available fields see [Capture Request](https://developer.cardconnect.com/cardconnect-api#capture-request)
 
@@ -68,7 +68,7 @@ All returned fields [Capture Response](https://developer.cardconnect.com/cardcon
 ```php
 $auth_retref = '123456654321';
 $params = []; // optional
-$void_response = $this->client->void($auth_retref, $params);
+$void_response = $client->void($auth_retref, $params);
 ```
 To view all available fields see [Void Request](https://developer.cardconnect.com/cardconnect-api#void-request)
 
@@ -78,7 +78,7 @@ All returned fields [Void Response](https://developer.cardconnect.com/cardconnec
 ```php
 $capture_retref = '123456654321';
 $params = []; // optional
-$void_response = $this->client->void($capture_retref, $params);
+$void_response = $client->void($capture_retref, $params);
 ```
 To view all available fields see [Refund Request](https://developer.cardconnect.com/cardconnect-api#refund-request)
 
@@ -87,14 +87,14 @@ All returned fields [Refund Response](https://developer.cardconnect.com/cardconn
 ## Transaction Status
 ```php
 $retref = '123456654321';
-$inquire_response = $this->client->inquire($retref);
+$inquire_response = $client->inquire($retref);
 ```
 All returned fields [Inquire Response](https://developer.cardconnect.com/cardconnect-api#inquire-response)
 
 ## Settlement Status
 ```php
 $date = '0118';
-$settlements = $this->client->settleStat($date);
+$settlements = $client->settleStat($date);
 $first_settlement = $settlements[0];
 ```
 All returned fields [Settlement Response](https://developer.cardconnect.com/cardconnect-api#settlement-response)
