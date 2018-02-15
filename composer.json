@@ -1,0 +1,37 @@
+{
+    "name": "dewbud/cardconnect",
+    "description": "PHP adapter for CardConnect CardPointe Gateway API",
+    "keywords": [
+        "cardconnect",
+        "cardpointe"
+    ],
+    "homepage": "https://github.com/Dewbud/CardConnect",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Dewbud",
+            "email": "jalfonso1134@gmail.com"
+        }
+    ],
+    "scripts": {
+        "test": "phpunit"
+    },
+    "autoload": {
+        "psr-4": {
+            "Dewbud\\CardConnect\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Dewbud\\CardConnect\\Tests\\": "tests/"
+        }
+    },
+    "require": {
+        "php": ">=5.5",
+        "guzzlehttp/guzzle": "^6.3"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "~6.0"
+    }
+}
