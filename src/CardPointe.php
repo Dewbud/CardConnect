@@ -81,7 +81,7 @@ class CardPointe
      *
      * @param array $request Array of request parameters
      *
-     * @return \Dewbud\CardConnect\Responses\Response
+     * @return \Dewbud\CardConnect\Responses\AuthorizationResponse|\Dewbud\CardConnect\Responses\CaptureResponse
      */
     public function authorize(array $request)
     {
@@ -118,7 +118,7 @@ class CardPointe
      *
      * @param string $retref transaction id
      * @param array $request request parameters
-     * @return \Dewbud\CardConnect\Responses\Response
+     * @return \Dewbud\CardConnect\Responses\CaptureResponse
      */
     public function capture(string $retref, $request = [])
     {
@@ -141,7 +141,7 @@ class CardPointe
      *
      * @param string $retref transaction id
      * @param array $request request parameters
-     * @return \Dewbud\CardConnect\Responses\Response
+     * @return \Dewbud\CardConnect\Responses\VoidResponse
      */
     public function void(string $retref, $request = [])
     {
@@ -163,7 +163,7 @@ class CardPointe
      * Refund a settled transaction
      *
      * @param array $request request parameters
-     * @return \Dewbud\CardConnect\Responses\Response
+     * @return \Dewbud\CardConnect\Responses\RefundResponse
      */
     public function refund($request = [])
     {
@@ -184,7 +184,7 @@ class CardPointe
      * Get status of a transaction
      *
      * @param array $retref transaction id
-     * @return \Dewbud\CardConnect\Responses\Response
+     * @return \Dewbud\CardConnect\Responses\InquireResponse
      */
     public function inquire(string $retref)
     {
@@ -203,7 +203,7 @@ class CardPointe
      * Get settlement status for a given day
      *
      * @param array $day MMDD
-     * @return array
+     * @return array|null
      */
     public function settleStat(string $day)
     {
