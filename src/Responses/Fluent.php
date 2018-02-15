@@ -138,17 +138,17 @@ class Fluent implements ArrayAccess, JsonSerializable
     {
         return $this->get($key);
     }
-    // /**
-    //  * Dynamically set the value of an attribute.
-    //  *
-    //  * @param  string  $key
-    //  * @param  mixed   $value
-    //  * @return void
-    //  */
-    // public function __set($key, $value)
-    // {
-    //     $this->offsetSet($key, $value);
-    // }
+    /**
+     * Dynamically set the value of an attribute.
+     *
+     * @param  string  $key
+     * @param  mixed   $value
+     * @return void
+     */
+    public function __set($key, $value)
+    {
+        $this->offsetSet($key, $value);
+    }
     /**
      * Dynamically check if an attribute is set.
      *

@@ -14,9 +14,9 @@ class SettlementResponse extends Response
         parent::__construct($res);
 
         $txns = [];
-        foreach ($this->attribute['txns'] as $t) {
+        foreach ($this->txns as $t) {
             $txns[] = new SettlementTransaction($t);
         }
-        $this->attribute['txns'] = $txns;
+        $this->txns = $txns;
     }
 }
