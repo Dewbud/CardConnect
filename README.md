@@ -18,6 +18,7 @@ $boolean = $client->testAuth();
 ## Tweaks
 Requests done to the API require an amount in cents but return a response in dollars.
 ex: 100 = '1.00'
+
 Responses are parsed and their amount fields are returned in cents like the requests for sanity.
 
 ## Response Objects
@@ -48,7 +49,9 @@ $capture_response = $this->client->authorize([
 ]);
 ```
 These are the minimum required fields.
+
 To view all available fields see [Authorization Request](https://developer.cardconnect.com/cardconnect-api#authorization-request)
+
 All returned fields [Authorization Response](https://developer.cardconnect.com/cardconnect-api#authorization-response)
 
 ## Capturing Transactions
@@ -58,6 +61,7 @@ $params = []; // optional
 $capture_response = $this->client->capture($auth_retref, $params);
 ```
 To view all available fields see [Capture Request](https://developer.cardconnect.com/cardconnect-api#capture-request)
+
 All returned fields [Capture Response](https://developer.cardconnect.com/cardconnect-api#capture-response)
 
 ## Voiding Transactions
@@ -67,6 +71,7 @@ $params = []; // optional
 $void_response = $this->client->void($auth_retref, $params);
 ```
 To view all available fields see [Void Request](https://developer.cardconnect.com/cardconnect-api#void-request)
+
 All returned fields [Void Response](https://developer.cardconnect.com/cardconnect-api#void-response)
 
 ## Refunding Transactions
@@ -76,6 +81,7 @@ $params = []; // optional
 $void_response = $this->client->void($capture_retref, $params);
 ```
 To view all available fields see [Refund Request](https://developer.cardconnect.com/cardconnect-api#refund-request)
+
 All returned fields [Refund Response](https://developer.cardconnect.com/cardconnect-api#refund-response)
 
 ## Transaction Status
