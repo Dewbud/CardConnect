@@ -101,11 +101,11 @@ All returned fields [Settlement Response](https://developer.cardconnect.com/card
 
 ## Future stuff
 Implement remains service endpoints
-    - Funding Service
-    - Profile Service
-    - Signature Capture Service (probably never)
-    - Open Batch Service
-    - Close Batch Service
-    - BIN Service
+- Funding Service
+- Profile Service
+- Signature Capture Service (probably never)
+- Open Batch Service
+- Close Batch Service
+- BIN Service
 
 
