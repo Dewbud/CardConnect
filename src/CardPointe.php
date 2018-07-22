@@ -25,7 +25,9 @@ class CardPointe
     const AUTH_TEXT       = 'CardConnect REST Servlet';
     const NO_BATCHES_TEXT = 'Null batches';
     const CLIENT_NAME     = 'PHP CARDCONNECT';
-    const CLIENT_VERSION  = '1.0.0';
+    const CLIENT_VERSION  = '1.0.2';
+
+    public $last_request = null;
 
     /**
      * @var \GuzzleHttp\Client
@@ -38,14 +40,14 @@ class CardPointe
      * @param string $merchant Merchant ID
      * @param string $user     Gateway username
      * @param string $pass     Gateway password
-     * @param string $endpont  Gateway endpoint
+     * @param string $endpoint Gateway endpoint
      */
-    public function __construct($merchant, $user, $pass, $endpont)
+    public function __construct($merchant, $user, $pass, $endpoint)
     {
         $this->merchant_id      = $merchant;
         $this->gateway_user     = $user;
         $this->gateway_pass     = $pass;
-        $this->gateway_endpoint = $endpont;
+        $this->gateway_endpoint = $endpoint;
 
         if (substr($this->gateway_endpoint, -1) != '/') {
             $this->gateway_endpoint .= '/';
@@ -85,18 +87,9 @@ class CardPointe
      */
     public function authorize(array $request)
     {
-        $required = [
-            'account',
-            'amount',
-            'expiry',
-        ];
-
-        $this->validateInput($required, $request);
-
         $params = [
             'merchid'  => $this->merchant_id,
             'currency' => 'USD',
-            'capture'  => null,
         ];
 
         $request = array_merge($params, $request);
@@ -105,12 +98,11 @@ class CardPointe
 
         $res = $this->parseResponse($res);
 
-        if (strtolower($request['capture']) == 'y') {
+        if (array_key_exists('capture', $request)) {
             return new CaptureResponse($res);
         }
 
         return new AuthorizationResponse($res);
-
     }
 
     /**
@@ -258,6 +250,8 @@ class CardPointe
      */
     protected function send($verb, $resource, $request = [], $options = [])
     {
+        $res = null;
+
         $default_options = [
             'allow_redirects' => false,
             'auth'            => [$this->gateway_user, $this->gateway_pass],
@@ -270,6 +264,8 @@ class CardPointe
 
         $options         = array_merge($default_options, $options);
         $options['json'] = $request;
+
+        $this->last_request = $options;
 
         try {
             // Send request
