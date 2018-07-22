@@ -7,7 +7,7 @@ $user        = 'username';
 $pass        = 'password';
 $server      = 'https://sub.domain.tld:1111/';
 
-$client = new \Dewbud\CardPointe($merchant_id, $user, $pass, $server);
+$client = new CardPointe($merchant_id, $user, $pass, $server);
 ```
 
 ## Testing Credentials
@@ -16,17 +16,16 @@ $boolean = $client->testAuth();
 ```
 
 ## Tweaks
-Requests done to the API require an amount in cents but return a response in dollars.
-ex: 100 = '1.00'
+Responses are parsed and their amount fields are returned in cents ```int```.
 
-Responses are parsed and their amount fields are returned in cents like the requests for sanity.
+The client stores the last request made as an ```array``` ```$client->last_request``` which can be used to debug requests
 
 ## Response Objects
 Responses are returned as objects and can be accessed as arrays.
 ```php
 $response = $client->inquire($retref);
 $response->amount; // returns int
-$response->toJSON(); // Returns JSON encoded string
+$response->toJSON(); // Returns JSON encoded string, accepts format codes (JSON_PRETTY_PRINT, etc)
 $response->toArray(); // Returns array of attributes
 ```
 
@@ -48,7 +47,6 @@ $capture_response = $client->authorize([
     'capture' => 'Y',
 ]);
 ```
-These are the minimum required fields. A CardConnectException is throw if 'account', 'amount', or 'expiry' keys aren't present.
 
 To view all available fields see [Authorization Request](https://developer.cardconnect.com/cardconnect-api#authorization-request)
 
@@ -98,6 +96,11 @@ $settlements = $client->settleStat($date);
 $first_settlement = $settlements[0];
 ```
 All returned fields see [Settlement Response](https://developer.cardconnect.com/cardconnect-api#settlement-response)
+
+## Tests
+```composer test```
+
+Note: small or large authorization/capture amounts don't seem to work with the test merchant credentials.
 
 ## Future stuff
 Implement remains service endpoints
