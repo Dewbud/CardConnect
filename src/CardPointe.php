@@ -17,9 +17,33 @@ use GuzzleHttp\Psr7\Response as GuzzleResponse;
 class CardPointe
 {
     // Credentials
-    public $merchant_id      = '';
-    public $gateway_user     = '';
-    public $gateway_pass     = '';
+    /**
+     * Processing Merchant ID
+     *
+     * @var string
+     */
+    public $merchant_id = '';
+
+    /**
+     * Merchant API username
+     *
+     * @var string
+     */
+    public $gateway_user = '';
+
+    /**
+     * Merchant API password
+     *
+     * @var string
+     */
+    public $gateway_pass = '';
+
+    /**
+     * Merchant servlet
+     * https://sub.domain.tld:port/
+     *
+     * @var string
+     */
     public $gateway_endpoint = '';
 
     const AUTH_TEXT       = 'CardConnect REST Servlet';
@@ -27,6 +51,11 @@ class CardPointe
     const CLIENT_NAME     = 'PHP CARDCONNECT';
     const CLIENT_VERSION  = '1.0.2';
 
+    /**
+     * Last request sent to server
+     *
+     * @var array
+     */
     public $last_request = null;
 
     /**
