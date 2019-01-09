@@ -155,4 +155,6 @@ class CardPointeTest extends TestCase
 
         $this->assertEquals(null, $settlements, $settlements);
     }
+
+    // @todo profile service tests
 }

@@ -249,6 +249,56 @@ class CardPointe
         return $settlements;
     }
 
+    /**
+     * Create a profile
+     *
+     * @param array $request
+     *
+     * @see https://developer.cardconnect.com/cardconnect-api?lang=php#create-update-profile-request
+     *
+     * @return Object
+     */
+    public function createProfile(array $request = [])
+    {
+        $res = $this->send('PUT', "profile", $request);
+
+        return $this->parseResponse($res);
+    }
+
+    /**
+     * Get profile(s)
+     *
+     * @param string $profile_id       profile id
+     * @param string|null $account_id  account id
+     *
+     * @see https://developer.cardconnect.com/cardconnect-api?lang=php#get-profile-request
+     *
+     * @return Object
+     */
+    public function profile(string $profile_id, $account_id = null)
+    {
+        $res = $this->send('GET', "profile/$profile_id/$account_id/{$this->merchant_id}");
+
+        return $this->parseResponse($res);
+    }
+
+    /**
+     * Delete profile(s)
+     *
+     * @param string $profile_id       profile id
+     * @param string|null $account_id  account id
+     *
+     * @see https://developer.cardconnect.com/cardconnect-api?lang=php#delete-profile-request
+     *
+     * @return Object
+     */
+    public function deleteProfile(string $profile_id, $account_id = null)
+    {
+        $res = $this->send('DELETE', "profile/$profile_id/$account_id/{$this->merchant_id}");
+
+        return $this->parseResponse($res);
+    }
+
     protected function validateInput(array $required, array $input)
     {
         foreach ($required as $field) {

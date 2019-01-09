@@ -97,6 +97,41 @@ $first_settlement = $settlements[0];
 ```
 All returned fields see [Settlement Response](https://developer.cardconnect.com/cardconnect-api#settlement-response)
 
+## Create/Update Profile
+```php
+// update a profile by providing 'profile' => $profile_id in the request
+$request = [
+    'merchid'     => "496400000840",
+    'defaultacct' => "Y",
+    'account'     => "4444333322221111",
+    'expiry'      => "0914",
+    'name'        => "Test User",
+    'address'     => "123 Test St",
+    'city'        => "TestCity",
+    'region'      => "TestState",
+    'country'     => "US",
+    'postal'      => "11111",
+];
+$res = $client->createProfile($request);
+```
+All returned fields see [Create/Update Profile Request](https://developer.cardconnect.com/cardconnect-api?lang=php#create-update-profile-response)
+
+## Get Profile
+```php
+$profile_id = '1023456789';
+$account_id = null; // optional
+$profile = $client->profile($profile_id, $account_id);
+```
+All returned fields see [Profile Response](https://developer.cardconnect.com/cardconnect-api?lang=php#get-profile-response)
+
+## Delete Profile
+```php
+$profile_id = '1023456789';
+$account_id = null; // optional
+$profile = $client->deleteProfile($profile_id, $account_id);
+```
+All returned fields see [Delete Profile Response](https://developer.cardconnect.com/cardconnect-api?lang=php#delete-profile-response)
+
 ## Tests
 ```composer test```
 
@@ -105,7 +140,6 @@ Note: small or large authorization/capture amounts don't seem to work with the t
 ## Future stuff
 Implement remains service endpoints
 - Funding Service
-- Profile Service
 - Signature Capture Service (probably never)
 - Open Batch Service
 - Close Batch Service
