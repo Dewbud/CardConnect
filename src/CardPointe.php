@@ -256,11 +256,16 @@ class CardPointe
      *
      * @see https://developer.cardconnect.com/cardconnect-api?lang=php#create-update-profile-request
      *
-     * @return Object
+     * @return array
      */
     public function createProfile(array $request = [])
     {
-        $res = $this->send('PUT', "profile", $request);
+        $params = [
+            'merchid' => $this->merchant_id,
+        ];
+
+        $request = array_merge($params, $request);
+        $res     = $this->send('PUT', "profile", $request);
 
         return $this->parseResponse($res);
     }

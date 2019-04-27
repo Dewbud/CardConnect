@@ -156,5 +156,25 @@ class CardPointeTest extends TestCase
         $this->assertEquals(null, $settlements, $settlements);
     }
 
-    // @todo profile service tests
+    /** @test */
+    public function createsProfile()
+    {
+        $response = $this->client->createProfile([
+            'defaultacct' => "Y",
+            'account'     => "4242424242424242",
+            'expiry'      => date('my', strtotime('next year')),
+            'name'        => "Test User",
+            'address'     => "123 Test St",
+            'city'        => "TestCity",
+            'region'      => "TestState",
+            'country'     => "US",
+            'postal'      => "11111",
+        ]);
+
+        $this->assertNotEmpty($response['profileid']);
+        $this->assertEquals('A', $response['respstat']);
+    }
+
+    // @todo more profile service tests
+
 }
