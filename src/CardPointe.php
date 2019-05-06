@@ -282,7 +282,7 @@ class CardPointe
      */
     public function profile(string $profile_id, $account_id = null)
     {
-        $res = $this->send('GET', "profile/$profile_id/$account_id/{$this->merchant_id}");
+        $res = $this->send('GET', "profile/$profile_id/$account_id/{$this->merchant_id}", null);
 
         return $this->parseResponse($res);
     }
@@ -299,7 +299,7 @@ class CardPointe
      */
     public function deleteProfile(string $profile_id, $account_id = null)
     {
-        $res = $this->send('DELETE', "profile/$profile_id/$account_id/{$this->merchant_id}");
+        $res = $this->send('DELETE', "profile/$profile_id/$account_id/{$this->merchant_id}", null);
 
         return $this->parseResponse($res);
     }
