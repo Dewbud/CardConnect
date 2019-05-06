@@ -101,7 +101,6 @@ All returned fields see [Settlement Response](https://developer.cardconnect.com/
 ```php
 // update a profile by providing 'profile' => $profile_id in the request
 $request = [
-    'merchid'     => "496400000840",
     'defaultacct' => "Y",
     'account'     => "4444333322221111",
     'expiry'      => "0914",
