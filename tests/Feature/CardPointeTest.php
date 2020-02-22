@@ -53,7 +53,7 @@ class CardPointeTest extends TestCase
     /** @test */
     public function detectsInvalidCredentials()
     {
-        $this->client->setAPIPassword('bad_password');
+        $this->client->setPassword('bad_password');
 
         $this->assertFalse($this->client->testAuth());
     }
