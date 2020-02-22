@@ -3,6 +3,7 @@
 namespace Tests;
 
 use Dewbud\CardConnect\CardPointe;
+use Dewbud\CardConnect\Requests\AuthorizationRequest;
 use Dewbud\CardConnect\Responses\AuthorizationResponse;
 use Dewbud\CardConnect\Responses\CaptureResponse;
 use Dewbud\CardConnect\Responses\InquireResponse;
@@ -36,11 +37,11 @@ class CardPointeTest extends TestCase
 
     public function log($text)
     {
-        fwrite(STDERR, $text . "\n");
+        fwrite(STDERR, $text."\n");
     }
 
     /**
-     * Tests
+     * Tests.
      */
 
     /** @test */
@@ -52,24 +53,23 @@ class CardPointeTest extends TestCase
     /** @test */
     public function detectsInvalidCredentials()
     {
-        $client               = $this->client;
-        $client->gateway_pass = 'bad_password';
-        $this->assertFalse($client->testAuth());
+        $this->client->setPassword('bad_password');
+
+        $this->assertFalse($this->client->testAuth());
     }
 
     /** @test */
     public function authorizesTransactions()
     {
-        $res = $this->client->authorize([
+        $request = new AuthorizationRequest([
             'account' => '4242424242424242',
             'amount'  => 500,
-            'expiry'  => '0120',
+            'expiry'  => date('my', strtotime('next year')),
         ]);
 
+        $res = $this->client->authorize($request);
+
         $this->assertInstanceOf(AuthorizationResponse::class, $res, get_class($res));
-        if (!$res->success()) {
-            fwrite(STDERR, print_r(json_encode($this->client->last_request, JSON_PRETTY_PRINT), true));
-        }
         $this->assertTrue($res->success(), $res->toJSON(JSON_PRETTY_PRINT));
         $this->assertEquals(500, $res->amount, $res->toJSON());
     }
@@ -77,12 +77,14 @@ class CardPointeTest extends TestCase
     /** @test */
     public function returnsCaptureResponseFromAuthorizeAndCapture()
     {
-        $res = $this->client->authorize([
+        $request = new AuthorizationRequest([
             'account' => '4242424242424242',
             'amount'  => 500,
-            'expiry'  => '0120',
-            'capture' => 'Y',
+            'expiry'  => date('my', strtotime('next year')),
+            'capture' => true,
         ]);
+
+        $res = $this->client->authorize($request);
 
         $this->assertInstanceOf(CaptureResponse::class, $res);
         $this->assertTrue($res->success(), $res->toJSON());
@@ -92,11 +94,14 @@ class CardPointeTest extends TestCase
     /** @test */
     public function capturesAuthorizations()
     {
-        $auth = $this->client->authorize([
+        $request = new AuthorizationRequest([
             'account' => '4242424242424242',
             'amount'  => 500,
-            'expiry'  => '0120',
+            'expiry'  => date('my', strtotime('next year')),
+            'capture' => true,
         ]);
+
+        $auth = $this->client->authorize($request);
 
         $cap = $this->client->capture($auth->retref);
 
@@ -108,11 +113,14 @@ class CardPointeTest extends TestCase
     /** @test */
     public function voidsTransactions()
     {
-        $auth = $this->client->authorize([
+        $request = new AuthorizationRequest([
             'account' => '4242424242424242',
             'amount'  => 500,
-            'expiry'  => '0120',
+            'expiry'  => date('my', strtotime('next year')),
+            'capture' => true,
         ]);
+
+        $auth = $this->client->authorize($request);
 
         $void = $this->client->void($auth->retref);
 
@@ -124,11 +132,13 @@ class CardPointeTest extends TestCase
     /** @test */
     public function inquiresAboutTransactions()
     {
-        $auth = $this->client->authorize([
+        $request = new AuthorizationRequest([
             'account' => '4242424242424242',
             'amount'  => 500,
-            'expiry'  => '0120',
+            'expiry'  => date('my', strtotime('next year')),
         ]);
+
+        $auth = $this->client->authorize($request);
 
         $inquire = $this->client->inquire($auth->retref);
 
@@ -142,7 +152,7 @@ class CardPointeTest extends TestCase
     {
         $settlements = $this->client->settleStat(date('md', strtotime('yesterday')));
 
-        $this->assertTrue($settlements != null, json_encode($settlements));
+        $this->assertTrue(null != $settlements, json_encode($settlements));
         $this->assertTrue(is_array($settlements[0]->txns), $settlements[0]->txns);
         $this->assertInstanceOf(SettlementTransaction::class, $settlements[0]->txns[0]);
         $this->assertTrue(is_int($settlements[0]->txns[0]->setlamount), $settlements[0]->txns[0]->setlamount);
@@ -160,15 +170,15 @@ class CardPointeTest extends TestCase
     public function createsProfile()
     {
         $response = $this->client->createProfile([
-            'defaultacct' => "Y",
-            'account'     => "4242424242424242",
+            'defaultacct' => 'Y',
+            'account'     => '4242424242424242',
             'expiry'      => date('my', strtotime('next year')),
-            'name'        => "Test User",
-            'address'     => "123 Test St",
-            'city'        => "TestCity",
-            'region'      => "TestState",
-            'country'     => "US",
-            'postal'      => "11111",
+            'name'        => 'Test User',
+            'address'     => '123 Test St',
+            'city'        => 'TestCity',
+            'region'      => 'TestState',
+            'country'     => 'US',
+            'postal'      => '11111',
         ]);
 
         $this->assertNotEmpty($response['profileid']);
@@ -176,5 +186,4 @@ class CardPointeTest extends TestCase
     }
 
     // @todo more profile service tests
-
 }

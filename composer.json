@@ -1,7 +1,7 @@
 {
     "name": "dewbud/cardconnect",
     "description": "PHP adapter for CardConnect CardPointe API",
-    "version": "1.0.4",
+    "version": "1.1.0",
     "keywords": [
         "cardconnect",
         "cardpointe"
@@ -16,7 +16,10 @@
         }
     ],
     "scripts": {
-        "test": "phpunit"
+        "test": "phpunit",
+        "lint": [
+            "php-cs-fixer fix --config ./.php_cs"
+        ]
     },
     "autoload": {
         "psr-4": {
@@ -33,6 +36,7 @@
         "guzzlehttp/guzzle": "^6.3"
     },
     "require-dev": {
-        "phpunit/phpunit": "~6.0"
+        "phpunit/phpunit": "~6.0",
+        "friendsofphp/php-cs-fixer": "^2.15"
     }
 }

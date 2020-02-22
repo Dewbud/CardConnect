@@ -7,7 +7,9 @@ use Dewbud\CardConnect\Responses\Traits\ConvertsNumbers;
 
 class Response extends Fluent
 {
-    use ChecksSuccess, ConvertsNumbers;
+    use ChecksSuccess;
+    use ConvertsNumbers;
+
     public function __construct(array $res)
     {
         parent::__construct($res);

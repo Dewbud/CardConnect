@@ -1,6 +1,6 @@
 <?php
 
-namespace Dewbud\CardConnect\Responses;
+namespace Dewbud\CardConnect;
 
 use ArrayAccess;
 use JsonSerializable;
@@ -13,6 +13,11 @@ class Fluent implements ArrayAccess, JsonSerializable
      * @var array
      */
     protected $attributes = [];
+
+    /**
+     * Attribute casting.
+     */
+    protected $casts = [];
 
     /**
      * Create a new fluent container instance.
@@ -54,13 +59,40 @@ class Fluent implements ArrayAccess, JsonSerializable
     }
 
     /**
+     * Cast an attribute.
+     *
+     * @param string $key
+     */
+    protected function castAttribute(string $type, $key)
+    {
+        $thing = $this->get($key);
+
+        switch ($type) {
+            case 'bool':
+                return (true === $thing) ? 'Y' : 'N';
+                break;
+            default:
+                return $thing;
+                break;
+        }
+    }
+
+    /**
      * Convert the Fluent instance to an array.
      *
      * @return array
      */
     public function toArray()
     {
-        return $this->attributes;
+        $data = $this->attributes;
+
+        foreach ($this->casts as $key => $type) {
+            if (array_key_exists($key, $data)) {
+                $data[$key] = $this->castAttribute($type, $key);
+            }
+        }
+
+        return $data;
     }
 
     /**
