@@ -3,11 +3,11 @@
 namespace Dewbud\CardConnect;
 
 use Dewbud\CardConnect\Exceptions\CardConnectException;
+use Dewbud\CardConnect\Requests\AuthorizationRequest;
 use Dewbud\CardConnect\Responses\AuthorizationResponse;
 use Dewbud\CardConnect\Responses\CaptureResponse;
 use Dewbud\CardConnect\Responses\InquireResponse;
 use Dewbud\CardConnect\Responses\RefundResponse;
-use Dewbud\CardConnect\Responses\Response;
 use Dewbud\CardConnect\Responses\SettlementResponse;
 use Dewbud\CardConnect\Responses\VoidResponse;
 use GuzzleHttp\Client;
@@ -16,47 +16,61 @@ use GuzzleHttp\Psr7\Response as GuzzleResponse;
 
 class CardPointe
 {
-    // Credentials
     /**
-     * Processing Merchant ID
+     * Merchant ID.
      *
      * @var string
      */
-    public $merchant_id = '';
+    protected $merchant_id = null;
 
     /**
-     * Merchant API username
+     * API username.
      *
      * @var string
      */
-    public $gateway_user = '';
+    protected $api_username = null;
 
     /**
-     * Merchant API password
+     * API password.
      *
      * @var string
      */
-    public $gateway_pass = '';
+    protected $api_password = null;
 
     /**
-     * Merchant servlet
-     * https://sub.domain.tld:port/
+     * Servlet endpoint.
+     *
+     * https://sub.domain.tld:port/.
      *
      * @var string
      */
-    public $gateway_endpoint = '';
+    protected $endpoint = '';
+
+    /**
+     * Currency code.
+     *
+     * @var string
+     */
+    protected $currency = 'USD';
 
     const AUTH_TEXT       = 'CardConnect REST Servlet';
     const NO_BATCHES_TEXT = 'Null batches';
     const CLIENT_NAME     = 'PHP CARDCONNECT';
-    const CLIENT_VERSION  = '1.0.2';
+    const CLIENT_VERSION  = '1.0.6';
 
     /**
-     * Last request sent to server
+     * Last request.
      *
      * @var array
      */
     public $last_request = null;
+
+    /**
+     * Last response.
+     *
+     * @var array
+     */
+    public $last_response = null;
 
     /**
      * @var \GuzzleHttp\Client
@@ -67,29 +81,24 @@ class CardPointe
      * CardConnect Client.
      *
      * @param string $merchant Merchant ID
-     * @param string $user     Gateway username
-     * @param string $pass     Gateway password
-     * @param string $endpoint Gateway endpoint
+     * @param string $user     API username
+     * @param string $pass     API password
+     * @param string $endpoint API endpoint
+     * @param string $currency USD, CAD, etc
      */
-    public function __construct($merchant, $user, $pass, $endpoint)
+    public function __construct($merchant, $user, $pass, $endpoint, $currency = 'USD')
     {
-        $this->merchant_id      = $merchant;
-        $this->gateway_user     = $user;
-        $this->gateway_pass     = $pass;
-        $this->gateway_endpoint = $endpoint;
-
-        if (substr($this->gateway_endpoint, -1) != '/') {
-            $this->gateway_endpoint .= '/';
-        }
-        $this->gateway_endpoint .= 'cardconnect/rest/';
-
-        $this->http = new Client(['base_uri' => $this->gateway_endpoint]);
+        $this->setMerchantId($merchant);
+        $this->setAPIUsername($user);
+        $this->setAPIPassword($pass);
+        $this->setEndpoint($endpoint);
+        $this->setCurrency($currency);
     }
 
     /**
      * Test credentials against gateway.
      *
-     * @return boolean
+     * @return bool
      */
     public function testAuth()
     {
@@ -104,30 +113,29 @@ class CardPointe
         }
 
         preg_match('/<h1>(.*?)<\/h1>/', $res->getBody(), $matches);
+
         return strtolower($matches[1]) == strtolower(self::AUTH_TEXT);
     }
 
     /**
      * Authorize a transaction.
      *
-     * @param array $request Array of request parameters
-     *
      * @return \Dewbud\CardConnect\Responses\AuthorizationResponse|\Dewbud\CardConnect\Responses\CaptureResponse
      */
-    public function authorize(array $request)
+    public function authorize(AuthorizationRequest $request)
     {
         $params = [
             'merchid'  => $this->merchant_id,
-            'currency' => 'USD',
+            'currency' => $this->currency,
         ];
 
-        $request = array_merge($params, $request);
+        $payload = array_merge($params, $request->toArray());
 
-        $res = $this->send('PUT', 'auth', $request);
+        $res = $this->send('PUT', 'auth', $payload);
 
         $res = $this->parseResponse($res);
 
-        if (array_key_exists('capture', $request)) {
+        if ($request->capture) {
             return new CaptureResponse($res);
         }
 
@@ -135,10 +143,11 @@ class CardPointe
     }
 
     /**
-     * Capture a previously authorized transaction
+     * Capture a previously authorized transaction.
      *
-     * @param string $retref transaction id
-     * @param array $request request parameters
+     * @param string $retref  transaction id
+     * @param array  $request request parameters
+     *
      * @return \Dewbud\CardConnect\Responses\CaptureResponse
      */
     public function capture(string $retref, $request = [])
@@ -158,10 +167,11 @@ class CardPointe
     }
 
     /**
-     * Void a previously authorized transaction
+     * Void a previously authorized transaction.
      *
-     * @param string $retref transaction id
-     * @param array $request request parameters
+     * @param string $retref  transaction id
+     * @param array  $request request parameters
+     *
      * @return \Dewbud\CardConnect\Responses\VoidResponse
      */
     public function void(string $retref, $request = [])
@@ -181,9 +191,10 @@ class CardPointe
     }
 
     /**
-     * Refund a settled transaction
+     * Refund a settled transaction.
      *
      * @param array $request request parameters
+     *
      * @return \Dewbud\CardConnect\Responses\RefundResponse
      */
     public function refund($request = [])
@@ -202,9 +213,10 @@ class CardPointe
     }
 
     /**
-     * Get status of a transaction
+     * Get status of a transaction.
      *
      * @param array $retref transaction id
+     *
      * @return \Dewbud\CardConnect\Responses\InquireResponse
      */
     public function inquire(string $retref)
@@ -221,9 +233,10 @@ class CardPointe
     }
 
     /**
-     * Get settlement status for a given day
+     * Get settlement status for a given day.
      *
      * @param array $day MMDD
+     *
      * @return array|null
      */
     public function settleStat(string $day)
@@ -250,9 +263,7 @@ class CardPointe
     }
 
     /**
-     * Create a profile
-     *
-     * @param array $request
+     * Create a profile.
      *
      * @see https://developer.cardconnect.com/cardconnect-api?lang=php#create-update-profile-request
      *
@@ -265,20 +276,20 @@ class CardPointe
         ];
 
         $request = array_merge($params, $request);
-        $res     = $this->send('PUT', "profile", $request);
+        $res     = $this->send('PUT', 'profile', $request);
 
         return $this->parseResponse($res);
     }
 
     /**
-     * Get profile(s)
+     * Get profile(s).
      *
-     * @param string $profile_id       profile id
-     * @param string|null $account_id  account id
+     * @param string      $profile_id profile id
+     * @param string|null $account_id account id
      *
      * @see https://developer.cardconnect.com/cardconnect-api?lang=php#get-profile-request
      *
-     * @return Object
+     * @return object
      */
     public function profile(string $profile_id, $account_id = null)
     {
@@ -288,14 +299,14 @@ class CardPointe
     }
 
     /**
-     * Delete profile(s)
+     * Delete profile(s).
      *
-     * @param string $profile_id       profile id
-     * @param string|null $account_id  account id
+     * @param string      $profile_id profile id
+     * @param string|null $account_id account id
      *
      * @see https://developer.cardconnect.com/cardconnect-api?lang=php#delete-profile-request
      *
-     * @return Object
+     * @return object
      */
     public function deleteProfile(string $profile_id, $account_id = null)
     {
@@ -314,7 +325,6 @@ class CardPointe
     }
 
     /**
-     * @param \GuzzleHttp\Psr7\Response $res
      * @return array
      */
     protected function parseResponse(GuzzleResponse $res)
@@ -323,12 +333,12 @@ class CardPointe
     }
 
     /**
-     * Send request via Guzzle
+     * Send request via Guzzle.
      *
-     * @param string $verb      HTTP verb
-     * @param string $resource  API resource
-     * @param array $request    Request Data
-     * @param array $options    Guzzle Options
+     * @param string $verb     HTTP verb
+     * @param string $resource API resource
+     * @param array  $request  Request Data
+     * @param array  $options  Guzzle Options
      *
      * @return \GuzzleHttp\Psr7\Response
      */
@@ -338,22 +348,23 @@ class CardPointe
 
         $default_options = [
             'allow_redirects' => false,
-            'auth'            => [$this->gateway_user, $this->gateway_pass],
+            'auth'            => [$this->api_username, $this->api_password],
             'headers'         => [
-                'User-Agent'   => self::CLIENT_NAME . ' v' . self::CLIENT_VERSION,
+                'User-Agent'   => self::CLIENT_NAME.' v'.self::CLIENT_VERSION,
                 'Content-Type' => 'application/json',
             ],
-            'verify'          => false, // self signed certs
+            'verify' => false, // self signed certs
         ];
 
-        $options         = array_merge($default_options, $options);
+        $options         = array_merge_recursive($default_options, $options);
         $options['json'] = $request;
 
         $this->last_request = $options;
 
         try {
             // Send request
-            $res = $this->http->request($verb, $resource, $options);
+            $res                 = $this->http->request($verb, $resource, $options);
+            $this->last_response = \json_decode($res->getBody(), true);
         } catch (ClientException $e) {
             throw $e;
             // $err = $e->getResponse();
@@ -361,5 +372,136 @@ class CardPointe
         }
 
         return $res;
+    }
+
+    /**
+     * Getters / Setters.
+     */
+
+    /**
+     * Get merchant ID.
+     *
+     * @return string
+     */
+    public function getMerchantId()
+    {
+        return $this->merchant_id;
+    }
+
+    /**
+     * Set merchant ID.
+     *
+     * @param string $merchant_id merchant ID
+     *
+     * @return self
+     */
+    public function setMerchantId(string $merchant_id)
+    {
+        $this->merchant_id = $merchant_id;
+
+        return $this;
+    }
+
+    /**
+     * Get API username.
+     *
+     * @return string
+     */
+    public function getAPIUsername()
+    {
+        return $this->api_username;
+    }
+
+    /**
+     * Set API username.
+     *
+     * @param string $api_username API username
+     *
+     * @return self
+     */
+    public function setAPIUsername(string $api_username)
+    {
+        $this->api_username = $api_username;
+
+        return $this;
+    }
+
+    /**
+     * Get API password.
+     *
+     * @return string
+     */
+    public function getAPIPassword()
+    {
+        return $this->api_password;
+    }
+
+    /**
+     * Set API password.
+     *
+     * @param string $api_password API password
+     *
+     * @return self
+     */
+    public function setAPIPassword(string $api_password)
+    {
+        $this->api_password = $api_password;
+
+        return $this;
+    }
+
+    /**
+     * Get endpoint.
+     *
+     * @return string
+     */
+    public function getEndpoint()
+    {
+        return $this->endpoint;
+    }
+
+    /**
+     * Set endpoint.
+     *
+     * @param string $endpoint https://sub.domain.tld:port/
+     *
+     * @return self
+     */
+    public function setEndpoint(string $endpoint)
+    {
+        $this->endpoint = $endpoint;
+
+        if ('/' != substr($this->endpoint, -1)) {
+            $this->endpoint .= '/';
+        }
+        $this->endpoint .= 'cardconnect/rest/';
+
+        $this->http = new Client(['base_uri' => $this->endpoint]);
+
+        return $this;
+    }
+
+    /**
+     * Get currency code.
+     *
+     * @return string
+     */
+    public function getCurrency()
+    {
+        return $this->currency;
+    }
+
+    /**
+     * Set currency code.
+     *
+     * @param string $currency currency code
+     *
+     * @return self
+     */
+    public function setCurrency(string $currency)
+    {
+        $this->currency = $currency;
+
+        return $this;
     }
 }
