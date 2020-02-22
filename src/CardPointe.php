@@ -56,7 +56,7 @@ class CardPointe
     const AUTH_TEXT       = 'CardConnect REST Servlet';
     const NO_BATCHES_TEXT = 'Null batches';
     const CLIENT_NAME     = 'PHP CARDCONNECT';
-    const CLIENT_VERSION  = '1.0.6';
+    const CLIENT_VERSION  = '1.1';
 
     /**
      * Last request.
