@@ -28,14 +28,14 @@ class CardPointe
      *
      * @var string
      */
-    protected $api_username = null;
+    protected $user = null;
 
     /**
      * API password.
      *
      * @var string
      */
-    protected $api_password = null;
+    protected $password = null;
 
     /**
      * Servlet endpoint.
@@ -88,11 +88,11 @@ class CardPointe
      */
     public function __construct($merchant, $user, $pass, $endpoint, $currency = 'USD')
     {
-        $this->setMerchantId($merchant);
-        $this->setAPIUsername($user);
-        $this->setAPIPassword($pass);
+        $this->merchant_id = $merchant;
+        $this->user        = $user;
+        $this->password    = $pass;
+        $this->currency    = $currency;
         $this->setEndpoint($endpoint);
-        $this->setCurrency($currency);
     }
 
     /**
@@ -348,7 +348,7 @@ class CardPointe
 
         $default_options = [
             'allow_redirects' => false,
-            'auth'            => [$this->api_username, $this->api_password],
+            'auth'            => [$this->user, $this->password],
             'headers'         => [
                 'User-Agent'   => self::CLIENT_NAME.' v'.self::CLIENT_VERSION,
                 'Content-Type' => 'application/json',
@@ -403,49 +403,49 @@ class CardPointe
     }
 
     /**
-     * Get API username.
+     * Get gateway username.
      *
      * @return string
      */
-    public function getAPIUsername()
+    public function getUser()
     {
-        return $this->api_username;
+        return $this->user;
     }
 
     /**
-     * Set API username.
+     * Set username.
      *
-     * @param string $api_username API username
+     * @param string $user API username
      *
      * @return self
      */
-    public function setAPIUsername(string $api_username)
+    public function setUser(string $user)
     {
-        $this->api_username = $api_username;
+        $this->user = $user;
 
         return $this;
     }
 
     /**
-     * Get API password.
+     * Get password.
      *
      * @return string
      */
-    public function getAPIPassword()
+    public function getPassword()
     {
-        return $this->api_password;
+        return $this->password;
     }
 
     /**
-     * Set API password.
+     * Set password.
      *
-     * @param string $api_password API password
+     * @param string $password API password
      *
      * @return self
      */
-    public function setAPIPassword(string $api_password)
+    public function setPassword(string $password)
     {
-        $this->api_password = $api_password;
+        $this->password = $password;
 
         return $this;
     }
