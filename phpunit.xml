@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit bootstrap="vendor/autoload.php"
-         colors="true"
-         verbose="true"
-         stopOnFailure="true">
+<phpunit bootstrap="vendor/autoload.php" colors="true" verbose="true" stopOnFailure="true">
     <testsuites>
+        <testsuite name="Feature">
+            <directory suffix=".php">./tests/Feature</directory>
+        </testsuite>
         <testsuite name="Unit">
             <directory suffix=".php">./tests/Unit</directory>
         </testsuite>
