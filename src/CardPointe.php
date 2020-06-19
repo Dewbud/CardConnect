@@ -8,6 +8,7 @@ use Dewbud\CardConnect\Responses\AuthorizationResponse;
 use Dewbud\CardConnect\Responses\CaptureResponse;
 use Dewbud\CardConnect\Responses\InquireResponse;
 use Dewbud\CardConnect\Responses\RefundResponse;
+use Dewbud\CardConnect\Responses\Response;
 use Dewbud\CardConnect\Responses\SettlementResponse;
 use Dewbud\CardConnect\Responses\VoidResponse;
 use GuzzleHttp\Client;
@@ -56,7 +57,7 @@ class CardPointe
     const AUTH_TEXT       = 'CardConnect REST Servlet';
     const NO_BATCHES_TEXT = 'Null batches';
     const CLIENT_NAME     = 'PHP CARDCONNECT';
-    const CLIENT_VERSION  = '1.1.0';
+    const CLIENT_VERSION  = '2.0.0';
 
     /**
      * Last request.
@@ -115,6 +116,40 @@ class CardPointe
         preg_match('/<h1>(.*?)<\/h1>/', $res->getBody(), $matches);
 
         return strtolower($matches[1]) == strtolower(self::AUTH_TEXT);
+    }
+
+    /**
+     * Validate the merchant ID.
+     *
+     * @return bool
+     */
+    public function validateMerchantId()
+    {
+        try {
+            $res = $this->inquireMerchant();
+        } catch (ClientException $e) {
+            return false;
+        }
+
+        return true === $res->enabled;
+    }
+
+    /**
+     * Get status of a transaction.
+     *
+     * @return \Dewbud\CardConnect\Responses\Response
+     */
+    public function inquireMerchant()
+    {
+        $params = [
+            'merchid' => $this->merchant_id,
+        ];
+
+        $res = $this->send('GET', "inquireMerchant/{$this->merchant_id}", $params);
+
+        $res = $this->parseResponse($res);
+
+        return new Response($res);
     }
 
     /**

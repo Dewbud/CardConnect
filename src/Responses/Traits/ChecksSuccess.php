@@ -9,6 +9,6 @@ trait ChecksSuccess
 {
     public function success()
     {
-        return 'A' == $this->respstat;
+        return 'A' === $this->respstat;
     }
 }

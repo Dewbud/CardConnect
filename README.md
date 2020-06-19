@@ -15,6 +15,11 @@ $client = new CardPointe($merchant_id, $user, $pass, $server);
 $boolean = $client->testAuth();
 ```
 
+## Validate Merchant ID
+```php
+$boolean = $client->validateMerchantId();
+```
+
 ## Tweaks
 Responses are parsed and their amount fields are returned in cents ```int```.
 
