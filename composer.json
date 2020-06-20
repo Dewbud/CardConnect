@@ -1,7 +1,7 @@
 {
     "name": "dewbud/cardconnect",
     "description": "PHP adapter for CardConnect CardPointe API",
-    "version": "1.1.0",
+    "version": "2.0.0",
     "keywords": [
         "cardconnect",
         "cardpointe"
@@ -13,6 +13,10 @@
         {
             "name": "Dewbud",
             "email": "jalfonso1134@gmail.com"
+        },
+        {
+            "name": "Contributors",
+            "homepage": "https://github.com/Dewbud/CardConnect/contributors"
         }
     ],
     "scripts": {
@@ -32,11 +36,17 @@
         }
     },
     "require": {
-        "php": ">=5.5",
-        "guzzlehttp/guzzle": "^6.3"
+        "php": "^7.2",
+        "ext-json": "*",
+        "guzzlehttp/guzzle": "^6.5"
     },
     "require-dev": {
-        "phpunit/phpunit": "~6.0",
-        "friendsofphp/php-cs-fixer": "^2.15"
+        "friendsofphp/php-cs-fixer": "^2.16",
+        "phpunit/phpunit": "^8.5"
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "preferred-install": "dist",
+        "sort-packages": true
     }
 }

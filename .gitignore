@@ -2,3 +2,4 @@ composer.phar
 /vendor/
 /.vscode/
 .php_cs.cache
+.phpunit.result.cache

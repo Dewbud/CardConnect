@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests;
+namespace Tests\Feature;
 
 use Dewbud\CardConnect\CardPointe;
 use Dewbud\CardConnect\Requests\AuthorizationRequest;
@@ -16,20 +16,20 @@ class CardPointeTest extends TestCase
     const MERCHANT = '496160873888';
     const USER     = 'testing';
     const PASS     = 'testing123';
-    const SERVER   = 'https://fts.cardconnect.com:6443/';
+    const SERVER   = 'https://fts-uat.cardconnect.com/';
 
     /**
      * @var \Dewbud\CardConnect\CardPointe
      */
     private $client;
 
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->client = new CardPointe(self::MERCHANT, self::USER, self::PASS, self::SERVER);
     }
 
-    public function tearDown()
+    protected function tearDown(): void
     {
         unset($this->client);
         parent::tearDown();
@@ -56,6 +56,12 @@ class CardPointeTest extends TestCase
         $this->client->setPassword('bad_password');
 
         $this->assertFalse($this->client->testAuth());
+    }
+
+    /** @test */
+    public function validateMerchantID()
+    {
+        $this->assertTrue($this->client->validateMerchantId());
     }
 
     /** @test */
@@ -153,7 +159,7 @@ class CardPointeTest extends TestCase
         $settlements = $this->client->settleStat(date('md', strtotime('yesterday')));
 
         $this->assertTrue(null != $settlements, json_encode($settlements));
-        $this->assertTrue(is_array($settlements[0]->txns), $settlements[0]->txns);
+        $this->assertTrue(is_array($settlements[0]->txns));
         $this->assertInstanceOf(SettlementTransaction::class, $settlements[0]->txns[0]);
         $this->assertTrue(is_int($settlements[0]->txns[0]->setlamount), $settlements[0]->txns[0]->setlamount);
     }
@@ -163,7 +169,7 @@ class CardPointeTest extends TestCase
     {
         $settlements = $this->client->settleStat(date('md', strtotime('tomorrow')));
 
-        $this->assertEquals(null, $settlements, $settlements);
+        $this->assertNull($settlements);
     }
 
     /** @test */

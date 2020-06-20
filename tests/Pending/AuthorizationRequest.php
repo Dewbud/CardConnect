@@ -10,20 +10,20 @@ class AuthorizationRequest extends TestCase
     const MERCHANT = '496160873888';
     const USER     = 'testing';
     const PASS     = 'testing123';
-    const SERVER   = 'https://fts.cardconnect.com:6443/';
+    const SERVER   = 'https://fts-uat.cardconnect.com/';
 
     /**
      * @var \Dewbud\CardConnect\CardPointe
      */
     private $client;
 
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->client = new CardPointe(self::MERCHANT, self::USER, self::PASS, self::SERVER);
     }
 
-    public function tearDown()
+    protected function tearDown(): void
     {
         unset($this->client);
         parent::tearDown();
