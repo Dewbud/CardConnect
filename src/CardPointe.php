@@ -170,7 +170,7 @@ class CardPointe
 
         $res = $this->parseResponse($res);
 
-        if ($request->capture) {
+        if ($request->capture && \in_array($request->capture, [true, 'Y', 'y'], true)) {
             return new CaptureResponse($res);
         }
 
