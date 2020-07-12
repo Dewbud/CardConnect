@@ -69,7 +69,11 @@ class Fluent implements ArrayAccess, JsonSerializable
 
         switch ($type) {
             case 'bool':
-                return (true === $thing) ? 'Y' : 'N';
+                if (is_bool($thing)) {
+                    return true === $thing ? 'Y' : 'N';
+                }
+                // Allows 'Y' and 'N' too.
+                return $thing;
                 break;
             default:
                 return $thing;

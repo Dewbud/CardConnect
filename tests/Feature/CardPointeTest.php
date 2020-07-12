@@ -188,8 +188,62 @@ class CardPointeTest extends TestCase
         ]);
 
         $this->assertNotEmpty($response['profileid']);
+        $this->assertNotEmpty($response['acctid']);
         $this->assertEquals('A', $response['respstat']);
     }
 
-    // @todo more profile service tests
+    /** @test */
+    public function createsProfileWhenAuthorizeAndCapture()
+    {
+        $request = new AuthorizationRequest([
+            'account' => '4242424242424242',
+            'amount'  => 500,
+            'expiry'  => date('my', strtotime('next year')),
+            'capture' => true,
+            'profile' => 'Y', // OR 'profile' => true,
+        ]);
+
+        $res = $this->client->authorize($request);
+
+        $this->assertInstanceOf(CaptureResponse::class, $res);
+        $this->assertTrue($res->success(), $res->toJSON());
+        $this->assertEquals(500, $res->amount, $res->toJSON());
+        $this->assertNotEmpty($res['profileid']);
+        $this->assertNotEmpty($res['acctid']);
+    }
+
+    /** @test */
+    public function returnsCaptureResponseFromAuthorizeAndCaptureUsingSavedCard()
+    {
+        $res = $this->client->createProfile([
+            'defaultacct' => 'Y',
+            'account'     => '4242424242424242',
+            'expiry'      => date('my', strtotime('next year')),
+            'name'        => 'Test User',
+            'address'     => '123 Test St',
+            'city'        => 'TestCity',
+            'region'      => 'TestState',
+            'country'     => 'US',
+            'postal'      => '11111',
+        ]);
+
+        $this->assertNotEmpty($res['profileid']);
+        $this->assertNotEmpty($res['acctid']);
+        $this->assertEquals('A', $res['respstat']);
+
+        $request = new AuthorizationRequest([
+            'amount'  => 500,
+            'expiry'  => date('my', strtotime('next year')),
+            'capture' => true,
+            'profile' => $res['profileid'] . '/' . $res['acctid'],
+        ]);
+
+        $res = $this->client->authorize($request);
+
+        $this->assertInstanceOf(CaptureResponse::class, $res);
+        $this->assertTrue($res->success(), $res->toJSON());
+        $this->assertEquals(500, $res->amount, $res->toJSON());
+    }
+
+    // @todo more profile service tests (profileGet, profileDelete)
 }

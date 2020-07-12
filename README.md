@@ -36,21 +36,36 @@ $response->toArray(); // Returns array of attributes
 
 ## Authorizing Transactions
 ```php
-$authorization_response = $client->authorize([
+$request = new AuthorizationRequest([
     'account' => '4242424242424242',
     'amount'  => '100',
     'expiry'  => '0120',
 ]);
+$authorization_response = $client->authorize($request);
 ```
 
 **You can also authorize and capture in the same request like so**
 ```php
-$capture_response = $client->authorize([
+$request = new AuthorizationRequest([
     'account' => '4242424242424242',
     'amount'  => '100',
     'expiry'  => '0120',
-    'capture' => 'Y',
+    'capture' => 'Y', // OR 'capture' => true,
+    'profile' => 'Y', // OR 'profile' => true,
 ]);
+$capture_response = $client->authorize($request);
+```
+
+**You can also authorize and capture in the same request using a saved card with PROFILE_ID/ACCOUNT_ID like so**
+```php
+$request = new AuthorizationRequest([
+    'account' => '4242424242424242',
+    'amount'  => '100',
+    'expiry'  => '0120',
+    'capture' => 'Y', // OR 'capture' => true,
+    'profile' => "$profile_id/$account_id", // using a profile/account
+]);
+$capture_response = $client->authorize($request);
 ```
 
 To view all available fields see [Authorization Request](https://developer.cardconnect.com/cardconnect-api#authorization-request)
