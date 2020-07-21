@@ -1,7 +1,7 @@
 {
     "name": "dewbud/cardconnect",
     "description": "PHP adapter for CardConnect CardPointe API",
-    "version": "2.0.0",
+    "version": "2.0.1",
     "keywords": [
         "cardconnect",
         "cardpointe"
