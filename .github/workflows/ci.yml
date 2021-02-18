@@ -14,7 +14,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        php-versions: ['7.2', '7.3', '7.4']
+        php-versions: ['7.3', '7.4']
 
     name: PHP ${{ matrix.php-versions }}
     env:
@@ -63,7 +63,10 @@ jobs:
     
       # Composer install dependencies
       - name: Install dependencies
-        uses: php-actions/composer@v1
+        uses: php-actions/composer@v5
+        with:
+          php_version: ${{ matrix.php-versions }}
+          version: 1
 
       # Runs tests
       - name: Execute tests
