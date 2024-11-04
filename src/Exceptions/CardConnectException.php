@@ -4,7 +4,7 @@ namespace Dewbud\CardConnect\Exceptions;
 
 class CardConnectException extends \Exception
 {
-    public $response = null;
+    public $response;
 
     public function __construct($response)
     {

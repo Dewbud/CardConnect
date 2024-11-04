@@ -2,10 +2,7 @@
 
 namespace Dewbud\CardConnect;
 
-use ArrayAccess;
-use JsonSerializable;
-
-class Fluent implements ArrayAccess, JsonSerializable
+class Fluent implements \ArrayAccess, \JsonSerializable
 {
     /**
      * All of the attributes set on the container.
@@ -35,9 +32,6 @@ class Fluent implements ArrayAccess, JsonSerializable
      * Get an attribute from the container.
      *
      * @param string $key
-     * @param mixed  $default
-     *
-     * @return mixed
      */
     public function get($key, $default = null)
     {
@@ -72,6 +66,7 @@ class Fluent implements ArrayAccess, JsonSerializable
                 if (is_bool($thing)) {
                     return true === $thing ? 'Y' : 'N';
                 }
+
                 // Allows 'Y' and 'N' too.
                 return $thing;
                 break;
@@ -104,7 +99,7 @@ class Fluent implements ArrayAccess, JsonSerializable
      *
      * @return array
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): mixed
     {
         return $this->toArray();
     }
@@ -125,10 +120,8 @@ class Fluent implements ArrayAccess, JsonSerializable
      * Determine if the given offset exists.
      *
      * @param string $offset
-     *
-     * @return bool
      */
-    public function offsetExists($offset)
+    public function offsetExists(mixed $offset): bool
     {
         return isset($this->attributes[$offset]);
     }
@@ -137,10 +130,8 @@ class Fluent implements ArrayAccess, JsonSerializable
      * Get the value for a given offset.
      *
      * @param string $offset
-     *
-     * @return mixed
      */
-    public function offsetGet($offset)
+    public function offsetGet(mixed $offset): mixed
     {
         return $this->get($offset);
     }
@@ -149,9 +140,8 @@ class Fluent implements ArrayAccess, JsonSerializable
      * Set the value at the given offset.
      *
      * @param string $offset
-     * @param mixed  $value
      */
-    public function offsetSet($offset, $value)
+    public function offsetSet(mixed $offset, mixed $value): void
     {
         $this->attributes[$offset] = $value;
     }
@@ -161,7 +151,7 @@ class Fluent implements ArrayAccess, JsonSerializable
      *
      * @param string $offset
      */
-    public function offsetUnset($offset)
+    public function offsetUnset(mixed $offset): void
     {
         unset($this->attributes[$offset]);
     }
@@ -185,8 +175,6 @@ class Fluent implements ArrayAccess, JsonSerializable
      * Dynamically retrieve the value of an attribute.
      *
      * @param string $key
-     *
-     * @return mixed
      */
     public function __get($key)
     {
@@ -197,7 +185,6 @@ class Fluent implements ArrayAccess, JsonSerializable
      * Dynamically set the value of an attribute.
      *
      * @param string $key
-     * @param mixed  $value
      */
     public function __set($key, $value)
     {

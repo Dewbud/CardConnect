@@ -9,19 +9,17 @@ use Dewbud\CardConnect\Responses\CaptureResponse;
 use Dewbud\CardConnect\Responses\InquireResponse;
 use Dewbud\CardConnect\Responses\SettlementTransaction;
 use Dewbud\CardConnect\Responses\VoidResponse;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 class CardPointeTest extends TestCase
 {
-    const MERCHANT = '496160873888';
-    const USER     = 'testing';
-    const PASS     = 'testing123';
-    const SERVER   = 'https://fts-uat.cardconnect.com/';
+    public const MERCHANT = '496160873888';
+    public const USER     = 'testing';
+    public const PASS     = 'testing123';
+    public const SERVER   = 'https://fts-uat.cardconnect.com/';
 
-    /**
-     * @var \Dewbud\CardConnect\CardPointe
-     */
-    private $client;
+    private CardPointe $client;
 
     protected function setUp(): void
     {
@@ -43,28 +41,26 @@ class CardPointeTest extends TestCase
     /**
      * Tests.
      */
-
-    /** @test */
+    #[Test]
     public function detectsValidCredentials()
     {
         $this->assertTrue($this->client->testAuth());
     }
 
-    /** @test */
+    #[Test]
     public function detectsInvalidCredentials()
     {
         $this->client->setPassword('bad_password');
-
         $this->assertFalse($this->client->testAuth());
     }
 
-    /** @test */
+    #[Test]
     public function validateMerchantID()
     {
         $this->assertTrue($this->client->validateMerchantId());
     }
 
-    /** @test */
+    #[Test]
     public function authorizesTransactions()
     {
         $request = new AuthorizationRequest([
@@ -80,7 +76,7 @@ class CardPointeTest extends TestCase
         $this->assertEquals(500, $res->amount, $res->toJSON());
     }
 
-    /** @test */
+    #[Test]
     public function returnsCaptureResponseFromAuthorizeAndCapture()
     {
         $request = new AuthorizationRequest([
@@ -97,7 +93,7 @@ class CardPointeTest extends TestCase
         $this->assertEquals(500, $res->amount, $res->toJSON());
     }
 
-    /** @test */
+    #[Test]
     public function capturesAuthorizations()
     {
         $request = new AuthorizationRequest([
@@ -108,15 +104,14 @@ class CardPointeTest extends TestCase
         ]);
 
         $auth = $this->client->authorize($request);
-
-        $cap = $this->client->capture($auth->retref);
+        $cap  = $this->client->capture($auth->retref);
 
         $this->assertInstanceOf(CaptureResponse::class, $cap);
         $this->assertTrue($cap->success(), $cap->toJSON());
         $this->assertEquals(500, $cap->amount, $cap->toJSON());
     }
 
-    /** @test */
+    #[Test]
     public function voidsTransactions()
     {
         $request = new AuthorizationRequest([
@@ -127,7 +122,6 @@ class CardPointeTest extends TestCase
         ]);
 
         $auth = $this->client->authorize($request);
-
         $void = $this->client->void($auth->retref);
 
         $this->assertInstanceOf(VoidResponse::class, $void);
@@ -135,7 +129,7 @@ class CardPointeTest extends TestCase
         $this->assertEquals('REVERS', $void->authcode, $void->toJSON());
     }
 
-    /** @test */
+    #[Test]
     public function inquiresAboutTransactions()
     {
         $request = new AuthorizationRequest([
@@ -144,8 +138,7 @@ class CardPointeTest extends TestCase
             'expiry'  => date('my', strtotime('next year')),
         ]);
 
-        $auth = $this->client->authorize($request);
-
+        $auth    = $this->client->authorize($request);
         $inquire = $this->client->inquire($auth->retref);
 
         $this->assertInstanceOf(InquireResponse::class, $inquire);
@@ -153,26 +146,25 @@ class CardPointeTest extends TestCase
         $this->assertEquals($auth->retref, $inquire->retref, $inquire->toJSON());
     }
 
-    /** @test */
+    #[Test]
     public function getsSettlements()
     {
         $settlements = $this->client->settleStat(date('md', strtotime('yesterday')));
 
-        $this->assertTrue(null != $settlements, json_encode($settlements));
-        $this->assertTrue(is_array($settlements[0]->txns));
+        $this->assertNotNull($settlements, json_encode($settlements));
+        $this->assertIsArray($settlements[0]->txns);
         $this->assertInstanceOf(SettlementTransaction::class, $settlements[0]->txns[0]);
-        $this->assertTrue(is_int($settlements[0]->txns[0]->setlamount), $settlements[0]->txns[0]->setlamount);
+        $this->assertIsInt($settlements[0]->txns[0]->setlamount, $settlements[0]->txns[0]->setlamount);
     }
 
-    /** @test */
+    #[Test]
     public function returnsNullForNoSettlements()
     {
         $settlements = $this->client->settleStat(date('md', strtotime('tomorrow')));
-
         $this->assertNull($settlements);
     }
 
-    /** @test */
+    #[Test]
     public function createsProfile()
     {
         $response = $this->client->createProfile([
@@ -192,7 +184,7 @@ class CardPointeTest extends TestCase
         $this->assertEquals('A', $response['respstat']);
     }
 
-    /** @test */
+    #[Test]
     public function createsProfileWhenAuthorizeAndCapture()
     {
         $request = new AuthorizationRequest([
@@ -200,7 +192,7 @@ class CardPointeTest extends TestCase
             'amount'  => 500,
             'expiry'  => date('my', strtotime('next year')),
             'capture' => true,
-            'profile' => 'Y', // OR 'profile' => true,
+            'profile' => 'Y',
         ]);
 
         $res = $this->client->authorize($request);
@@ -212,7 +204,7 @@ class CardPointeTest extends TestCase
         $this->assertNotEmpty($res['acctid']);
     }
 
-    /** @test */
+    #[Test]
     public function returnsCaptureResponseFromAuthorizeAndCaptureUsingSavedCard()
     {
         $res = $this->client->createProfile([
@@ -235,7 +227,7 @@ class CardPointeTest extends TestCase
             'amount'  => 500,
             'expiry'  => date('my', strtotime('next year')),
             'capture' => true,
-            'profile' => $res['profileid'] . '/' . $res['acctid'],
+            'profile' => $res['profileid'].'/'.$res['acctid'],
         ]);
 
         $res = $this->client->authorize($request);

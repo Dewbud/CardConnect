@@ -7,13 +7,13 @@ use PHPUnit\Framework\TestCase;
 
 class AuthorizationRequest extends TestCase
 {
-    const MERCHANT = '496160873888';
-    const USER     = 'testing';
-    const PASS     = 'testing123';
-    const SERVER   = 'https://fts-uat.cardconnect.com/';
+    public const MERCHANT = '496160873888';
+    public const USER     = 'testing';
+    public const PASS     = 'testing123';
+    public const SERVER   = 'https://fts-uat.cardconnect.com/';
 
     /**
-     * @var \Dewbud\CardConnect\CardPointe
+     * @var CardPointe
      */
     private $client;
 
